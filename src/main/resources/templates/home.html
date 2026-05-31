@@ -81,6 +81,14 @@
     </div>
 </div>
 
+<footer class="container mt-5 pb-3">
+    <hr class="text-muted">
+    <p class="text-center text-muted small mb-0"
+       th:text="${'실습 수행 일시: ' + #temporals.format(#temporals.createNow(), 'yyyy년 MM월 dd일 (E) a hh:mm:ss') + ' │ 학번: 2171073 │ 성명: 이경석'}">
+        실습 수행 일시: 2026년 05월 31일 (일) 오후 02:34:17 │ 학번: 2171073 │ 성명: 이경석
+    </p>
+</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
