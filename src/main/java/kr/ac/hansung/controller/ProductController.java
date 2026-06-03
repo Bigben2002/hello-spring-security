@@ -3,6 +3,7 @@ package kr.ac.hansung.controller;
 import kr.ac.hansung.entity.Product;
 import kr.ac.hansung.dto.ProductDto;
 import kr.ac.hansung.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/products")
@@ -56,6 +59,41 @@ public class ProductController {
     @PostMapping
     public String save(@ModelAttribute ProductDto dto) {
         productService.save(dto);
+        return "redirect:/products";
+    }
+
+    // 상품 수정 폼 표시: 기존 상품 정보를 조회해 ProductDto에 담아 입력값을 미리 채운다.
+    @GetMapping("/{id}/edit")
+    public String editProductForm(@PathVariable Long id, Model model) {
+        Product product = productService.findById(id);
+
+        ProductDto dto = new ProductDto();
+        dto.setName(product.getName());
+        dto.setPrice(product.getPrice());
+        dto.setStock(product.getStock());
+        dto.setDescription(product.getDescription());
+
+        model.addAttribute("productDto", dto);
+        model.addAttribute("productId", id);
+
+        return "products/edit";
+    }
+
+    // 상품 수정 처리: 검증 오류가 있으면 수정 폼으로 돌아가고, 정상이면 Dirty Checking으로 변경 내용을 저장한다.
+    @PostMapping("/{id}/edit")
+    public String editProduct(@PathVariable Long id,
+                              @Valid @ModelAttribute ProductDto productDto,
+                              BindingResult bindingResult,
+                              Model model,
+                              RedirectAttributes ra) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("productId", id);
+            return "products/edit";
+        }
+
+        productService.updateProduct(id, productDto);
+        ra.addFlashAttribute("successMessage", "상품이 수정되었습니다.");
+
         return "redirect:/products";
     }
 
