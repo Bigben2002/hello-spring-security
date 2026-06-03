@@ -1,5 +1,7 @@
 package kr.ac.hansung.controller;
 
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
@@ -33,5 +35,16 @@ public class HomeController {
                 .toList();
         model.addAttribute("roles", roles);
         return "home";
+    }
+
+    @GetMapping("/access-denied")
+    public String accessDenied(HttpServletRequest request, Model model) {
+        Object forwardedUri = request.getAttribute(RequestDispatcher.FORWARD_REQUEST_URI);
+        String requestUri = forwardedUri != null ? forwardedUri.toString() : request.getRequestURI();
+
+        model.addAttribute("statusCode", 403);
+        model.addAttribute("errorName", "Forbidden");
+        model.addAttribute("requestUri", requestUri);
+        return "access-denied";
     }
 }
